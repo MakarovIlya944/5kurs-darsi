@@ -5,3 +5,4 @@ class Solver():
         super().__init__()
 
     def Solve(self):
+      print('Solve')

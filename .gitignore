@@ -338,3 +338,7 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/5kurs-darsi/env
+/5kurs-darsi/venv
+/solver/libtest.so
+/solver/call.so

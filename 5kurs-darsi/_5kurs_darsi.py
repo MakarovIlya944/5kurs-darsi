@@ -1,7 +1,9 @@
 from task import TaskFabric
+from net import NetFabric
 
 if __name__ == "__main__":
+  print('Start')
 
-    task = TaskFabric.CreateTask()
-    task.Run()
-    Paint(task)
+  net = NetFabric.CreateNetDefault()
+
+  print('End')
