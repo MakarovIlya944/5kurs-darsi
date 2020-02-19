@@ -1,4 +1,4 @@
-#include "MatrixGenerator.h"
+#include "matrix.hpp"
 
 double MatrixGenerator::CoefficientDiffusion(Pointd v)
 {
