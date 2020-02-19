@@ -6,7 +6,7 @@
 
 using namespace std;
 
-Net NetGenerator::Generate(vector<double> R, vector<double> Z, double step, vector<double> r_steps, 
+Net* NetGenerator::Generate(vector<double> R, vector<double> Z, double step, vector<double> r_steps, 
 	vector<double> z_steps, vector<int> W, vector<Pointi> area, vector<int> B, vector<int> V, vector<Pointi> border,
 	vector<double> T, double t_step, vector<double> t_steps)
 {
@@ -14,7 +14,7 @@ Net NetGenerator::Generate(vector<double> R, vector<double> Z, double step, vect
 	// r_steps.size() // 2 == 0 && r_steps.size() / 2 == R.size() - 1
 	// Z.size() // 2 == 0 && z_steps.size() / 2 == Z.size() - 1
 
-	Net net = Net();
+	Net *net = new Net();
 	try
 	{
 		int nr = R.size(), nz = Z.size();
@@ -52,19 +52,19 @@ Net NetGenerator::Generate(vector<double> R, vector<double> Z, double step, vect
 		}
 		Zh[nhz] = Z[nz - 1];
 
-		net.rNum = nhr + 1;
-		net.zNum = nhz + 1;
-		net.Num = net.rNum * net.zNum;
-		net.GlobalNet = new Pointd[net.Num];
+		net->rNum = nhr + 1;
+		net->zNum = nhz + 1;
+		net->Num = net->rNum * net->zNum;
+		net->GlobalNet = vector<Pointd>(net->Num) ;// new Pointd[net->Num];
 		int n = nhr * nhz / 4;
-		net.nvtr = new int[n * 9];
-		net.nvcat = new int[n];
-		net.NumEl = n;
+		net->nvtr = vector<int>(n * 9);// new int[n * 9];
+		net->nvcat = vector<int>(n);//new int[n];
+		net->NumEl = n;
 		double tmp;
-		for (int i(0), w(0), currentelem(0); i < net.zNum; i++)
+		for (int i(0), w(0), currentelem(0); i < net->zNum; i++)
 		{
 			tmp = Zh[i];
-			for (int j(0); j < net.rNum; j++)
+			for (int j(0); j < net->rNum; j++)
 			{
 				if ((i % 2) && (j % 2))
 				{
@@ -74,32 +74,32 @@ Net NetGenerator::Generate(vector<double> R, vector<double> Z, double step, vect
 							if (i < z_steps[(area[k + 1].z - 1)*2] && (area[k].z == 0 || z_steps[(area[k].z - 1)*2] < i))
 								w = W[k / 2];
 					}
-					net.nvcat[currentelem++] = w;
+					net->nvcat[currentelem++] = w;
 					w = 0;
 				}
-				net.GlobalNet[i * net.rNum + j] = Pointd(Rh[j], tmp);
+				net->GlobalNet[i * net->rNum + j] = Pointd(Rh[j], tmp);
 			}
 		}
 
 		GenerationNVTR(net);
 
-		net.nvr1.clear();
-		net.nvr2.clear();
-		net.nvr3.clear();
+		net->nvr1.clear();
+		net->nvr2.clear();
+		net->nvr3.clear();
 
 		int nb = B.size();
 
 		for (int i(0), j(0); i < nb; i++, j++)
 		{
-			list<int>* iterator = &(net.nvr1);
+			list<int>* iterator = &(net->nvr1);
 
 			switch (B[i])
 			{
 			case 2:
-				iterator = &(net.nvr2);
+				iterator = &(net->nvr2);
 				break;
 			case 3:
-				iterator = &(net.nvr3);
+				iterator = &(net->nvr3);
 			}
 			iterator->push_back(V[i]);
 			if (border[j].r == border[j + 1].r)
@@ -107,10 +107,10 @@ Net NetGenerator::Generate(vector<double> R, vector<double> Z, double step, vect
 				int l = border[j].z != 0 ? z_steps[(border[j].z - 1)*2] : 0;
 				int k = border[j].r != 0 ? r_steps[(border[j].r - 1)*2] : 0;
 				if (border[j].z == border[j + 1].z)
-					iterator->push_back(l * net.rNum + k);
+					iterator->push_back(l * net->rNum + k);
 				int nl(z_steps[(border[++j].z - 1)*2]);
 				for (; l <= nl; l++)
-					iterator->push_back(l * net.rNum + k);
+					iterator->push_back(l * net->rNum + k);
 			}
 			else
 			{
@@ -118,7 +118,7 @@ Net NetGenerator::Generate(vector<double> R, vector<double> Z, double step, vect
 				int k = border[j].z != 0 ? z_steps[(border[j].z - 1)*2] : 0;
 				int nl(r_steps[(border[++j].r - 1)*2]);
 				for (; l <= nl; l++)
-					iterator->push_back(k * net.rNum + l);
+					iterator->push_back(k * net->rNum + l);
 			}
 			iterator->push_back(-1);
 		}
@@ -127,15 +127,15 @@ Net NetGenerator::Generate(vector<double> R, vector<double> Z, double step, vect
 		for (auto i= t_steps.begin(); i != t_steps.end(); i+=2)
 			nht += (int)(*i);
 
-		net.GlobalTime = new double[nht + 1];
-		net.GlobalTime[0] = T[0];
+		net->GlobalTime = vector<double>(nht + 1);// new double[nht + 1];
+		net->GlobalTime[0] = T[0];
 		for (int i(0), k(0); k < nht; i++)
 		{
 			tmp = t_step * t_steps[i*2+1];
 			for (int j(0); j < t_steps[i*2]; j++, k++)
-				net.GlobalTime[k + 1] = net.GlobalTime[k] + tmp;
+				net->GlobalTime[k + 1] = net->GlobalTime[k] + tmp;
 		}
-		net.NumT = nht + 1;
+		net->NumT = nht + 1;
 
 		delete[] Rh;
 		delete[] Zh;
@@ -149,12 +149,12 @@ Net NetGenerator::Generate(vector<double> R, vector<double> Z, double step, vect
 		ofstream out;
 		out.open(fileName);
 
-		for (int i(0); i < net.NumT; i++)
-			out << net.GlobalTime[i];
-		for (int i(0); i < net.rNum; i++)
-			out << net.GlobalNet[i].r;
-		for (int i(0), j(0); i < net.zNum; i++, j += net.rNum)
-			out << net.GlobalNet[i].z;
+		for (int i(0); i < net->NumT; i++)
+			out << net->GlobalTime[i];
+		for (int i(0); i < net->rNum; i++)
+			out << net->GlobalNet[i].r;
+		for (int i(0), j(0); i < net->zNum; i++, j += net->rNum)
+			out << net->GlobalNet[i].z;
 
 		out.close();
 	}
@@ -257,10 +257,10 @@ Net* NetGenerator::GenerateFromFiles(const char* FNameN, const char* FNameB, con
 		net->rNum = nhr + 1;
 		net->zNum = nhz + 1;
 		net->Num = net->rNum * net->zNum;
-		net->GlobalNet = new Pointd[net->Num];
+		net->GlobalNet = vector<Pointd>(net->Num);// = new Pointd[net->Num];
 		int n = nhr * nhz / 4;
-		net->nvtr = new int[n * 9];
-		net->nvcat = new int[n];
+		net->nvtr = vector<int>(n * 9);// = new int[n * 9];
+		net->nvcat = vector<int>(n);//= new int[n];
 		net->NumEl = n;
 		double tmp;
 		for (int i(0), w(0), currentelem(0); i < net->zNum; i++)
@@ -360,7 +360,7 @@ Net* NetGenerator::GenerateFromFiles(const char* FNameN, const char* FNameB, con
 			nht += ht[i];
 		}
 
-		net->GlobalTime = new double[nht + 1];
+		net->GlobalTime = vector<double>(nht + 1);// = new double[nht + 1];
 		net->GlobalTime[0] = T[0];
 		for (int i(0), k(0); k < nht; i++)
 		{
@@ -407,32 +407,32 @@ Net* NetGenerator::GenerateFromFiles(const char* FNameN, const char* FNameB, con
 	return net;
 }
 
-	void NetGenerator::GenerationNVTR(Net &net)
-	{
-		int zn = net.zNum - 1, rn = net.rNum - 1;
-		for (int z(0), current(0); z < zn; z += 2)
-			for (int r(0); r < rn; r += 2)
-			{
-				int index = r + z * net.rNum;
-				net.nvtr[current++] = index;
-				net.nvtr[current++] = index + 1;
-				net.nvtr[current++] = index + 2;
+void NetGenerator::GenerationNVTR(Net *net)
+{
+	int zn = net->zNum - 1, rn = net->rNum - 1;
+	for (int z(0), current(0); z < zn; z += 2)
+		for (int r(0); r < rn; r += 2)
+		{
+			int index = r + z * net->rNum;
+			net->nvtr[current++] = index;
+			net->nvtr[current++] = index + 1;
+			net->nvtr[current++] = index + 2;
 
-				net.nvtr[current++] = index + net.rNum;
-				net.nvtr[current++] = index + net.rNum + 1;
-				net.nvtr[current++] = index + net.rNum + 2;
+			net->nvtr[current++] = index + net->rNum;
+			net->nvtr[current++] = index + net->rNum + 1;
+			net->nvtr[current++] = index + net->rNum + 2;
 
-				net.nvtr[current++] = index + 2 * net.rNum;
-				net.nvtr[current++] = index + 2 * net.rNum + 1;
-				net.nvtr[current++] = index + 2 * net.rNum + 2;
-			}
-	}
+			net->nvtr[current++] = index + 2 * net->rNum;
+			net->nvtr[current++] = index + 2 * net->rNum + 1;
+			net->nvtr[current++] = index + 2 * net->rNum + 2;
+		}
+}
 
 	Net::~Net()
 	{
-		delete GlobalNet;
-		delete nvcat;
-		delete nvtr;
+		GlobalNet.clear();
+		nvcat.clear();
+		nvtr.clear();
 		nvr1.clear();
 		nvr2.clear();
 		nvr3.clear();

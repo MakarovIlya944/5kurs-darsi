@@ -3,6 +3,7 @@
 #ifdef _DEBUG
 #else
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #endif 
 #include <fstream>
 #include <iostream>
@@ -60,13 +61,13 @@ public:
 	//NumEl - num of elements
 	int NumEl;
 	//GlobalNet - koords of all points (r,z)
-	Pointd* GlobalNet;
+	vector<Pointd> GlobalNet;
 	//time net
-	double* GlobalTime;
+	vector<double> GlobalTime;
 	//nvtr - elements
-	int* nvtr;
+	vector<int> nvtr;
 	//nvcat - materials
-	int* nvcat;
+	vector<int> nvcat;
 	//nvr1 - first border condition
 	list<int> nvr1;
 	//nvr2 - second border condition
@@ -87,12 +88,12 @@ public:
 	bool isSavingNet = false;
 	const char* fileName = "default.txt";
 
-	Net Generate(vector<double> R, vector<double> Z, double step, vector<double> r_steps, vector<double> z_steps, vector<int> materialIds, vector<Pointi> materials, vector<int> B, vector<int> V, vector<Pointi> border, vector<double> T, double t_step, vector<double> t_steps);
+	Net* Generate(vector<double> R, vector<double> Z, double step, vector<double> r_steps, vector<double> z_steps, vector<int> materialIds, vector<Pointi> materials, vector<int> B, vector<int> V, vector<Pointi> border, vector<double> T, double t_step, vector<double> t_steps);
 
 	//FNameN - net.txt , FNameB - border.txt , FNameT - time.txt
 	Net* GenerateFromFiles(const char* FNameN, const char* FNameB, const char* FNameT);
 
-	void GenerationNVTR(Net &net);
+	void GenerationNVTR(Net *net);
 };
 
 #ifdef _DEBUG
@@ -129,6 +130,20 @@ Materials border
 		.def_readwrite("nvr1", &Net::nvr1, R"pbdoc(first border condition)pbdoc")
 		.def_readwrite("nvr2", &Net::nvr2, R"pbdoc(second border condition)pbdoc")
 		.def_readwrite("nvr3", &Net::nvr3, R"pbdoc(third border condition)pbdoc");
+
+	py::class_<Pointd>(m, "Pointd")
+		.def(py::init<>())
+		.def_readwrite("r", &Pointd::r)
+		.def_readwrite("z", &Pointd::z)
+		.def("+", &Pointd::operator+)
+		.def("-", &Pointd::operator-)
+		;
+
+	py::class_<Pointi>(m, "Pointi")
+		.def(py::init<>())
+		.def_readwrite("r", &Pointi::r)
+		.def_readwrite("z", &Pointi::z)
+		;
 
 #ifdef VERSION_INFO
 	m.attr("__version__") = VERSION_INFO;
