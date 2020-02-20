@@ -1,4 +1,20 @@
-from cpp_solver import NetGenerator, Net
+from decouple import config
+LINUX = config('LINUX',cast=bool) or False
+if not LINUX:
+    from cpp_solver import NetGenerator, Net
+else:
+    import cppyy
+    import os
+    solver_path = os.path.dirname(os.path.realpath(__file__) )+ '/../solver'
+    cppyy.include('fstream')
+    cppyy.include('iostream')
+    cppyy.include('list')
+    cppyy.include('vector')
+    cppyy.include('iterator')
+    cppyy.include('tuple')
+    cppyy.include(solver_path + '/net.hpp')
+    cppyy.include(solver_path + '/net.cpp')
+    from cppyy.gbl import NetGenerator, Net
 
 class NetFabric():
     def CreateNetDefault(netFile="..\\solver\\net.txt",borderFile="..\\solver\\border.txt",timeFile="..\\solver\\time.txt"):

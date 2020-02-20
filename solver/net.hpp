@@ -1,10 +1,14 @@
 ﻿#pragma once
-#include <Windows.h>
+#ifdef WINDOWS
 #ifdef _DEBUG
 #else
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #endif 
+#include <Windows.h>
+#else
+#include <stdio.h>
+#endif
 #include <fstream>
 #include <iostream>
 #include <list>

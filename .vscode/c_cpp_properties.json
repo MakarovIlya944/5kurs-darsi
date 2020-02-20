@@ -6,7 +6,7 @@
                 "${workspaceFolder}/**"
             ],
             "defines": ["_DEBUG", "LINUX"],
-            "compilerPath": "/usr/bin/gcc",
+            "compilerPath": "/usr/bin/g++",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64"
@@ -17,7 +17,7 @@
                 "${workspaceFolder}/**"
             ],
             "defines": ["LINUX"],
-            "compilerPath": "/usr/bin/gcc",
+            "compilerPath": "/usr/bin/g++",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64"
