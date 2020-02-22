@@ -139,7 +139,11 @@ Net* NetGenerator::Generate(vector<double> R, vector<double> Z, double step, vec
 	}
 	catch (const std::exception & exception)
 	{
+		#ifdef WINDOWS
 		printf_s("Error: %s", exception.what());
+		#else
+		printf("Error: %s", exception.what());
+		#endif
 	}
 	if (isSavingNet)
 	{
@@ -169,30 +173,50 @@ Net* NetGenerator::GenerateFromFiles(const char* FNameN, const char* FNameB, con
 		int nr, nz;
 		in >> nr;
 		if (isLoging)
+			#ifdef WINDOWS 
 			printf_s("nr: %d\n", nr);
+			#else
+			printf("nr: %d\n", nr);
+			#endif
 		double* R = new double[nr];
 		for (int i(0); i < nr; i++)
 		{
 			in >> R[i];
 			if (isLoging)
+				#ifdef WINDOWS 
 				printf_s("R[%d]: %f\n", i, R[i]);
+				#else
+				printf("R[%d]: %f\n", i, R[i]);
+				#endif
 		}
 
 		in >> nz;
 		if (isLoging)
+			#ifdef WINDOWS 
 			printf_s("nz: %d\n", nz);
+			#else
+			printf("nz: %d\n", nz);
+			#endif
 		double* Z = new double[nz];
 		for (int i(0); i < nz; i++)
 		{
 			in >> Z[i];
 			if (isLoging)
+				#ifdef WINDOWS 
 				printf_s("Z[%d]: %f\n", i, Z[i]);
+				#else
+				printf("Z[%d]: %f\n", i, Z[i]);
+				#endif
 		}
 
 		double step;
 		in >> step;
 		if (isLoging)
+			#ifdef WINDOWS 
 			printf_s("step: %f\n", step);
+			#else
+			printf("step: %f\n", step);
+			#endif
 		step *= 0.5;
 		double* kr = new double[nr - 1], * kz = new double[nz - 1];
 		int* hr = new int[nr - 1], nhr(0), * hz = new int[nz - 1], nhz(0);
@@ -201,7 +225,11 @@ Net* NetGenerator::GenerateFromFiles(const char* FNameN, const char* FNameB, con
 			in >> hr[i];
 			in >> kr[i];
 			if (isLoging)
+				#ifdef WINDOWS 
 				printf_s("hr[%d]: %d\nkr[%d]: %f\n", i, hr[i], i,  kr[i]);
+				#else
+				printf("hr[%d]: %d\nkr[%d]: %f\n", i, hr[i], i,  kr[i]);
+				#endif
 			hr[i] *= 2;
 			nhr += hr[i];
 		}
@@ -210,7 +238,11 @@ Net* NetGenerator::GenerateFromFiles(const char* FNameN, const char* FNameB, con
 			in >> hz[i];
 			in >> kz[i];
 			if (isLoging)
+				#ifdef WINDOWS 
 				printf_s("hz[%d]: %d\nkz[%d]: %f\n", i, hz[i], i, kz[i]);
+				#else
+				printf("hz[%d]: %d\nkz[%d]: %f\n", i, hz[i], i, kz[i]);
+				#endif
 			hz[i] *= 2;
 			nhz += hz[i];
 		}
@@ -218,7 +250,11 @@ Net* NetGenerator::GenerateFromFiles(const char* FNameN, const char* FNameB, con
 		int nw;
 		in >> nw;
 		if (isLoging)
+			#ifdef WINDOWS 
 			printf_s("step: %d\n", nw);
+			#else
+			printf("step: %d\n", nw);
+			#endif
 		int* W = new int[nw];
 		Pointi* area = new Pointi[nw * 2]{};
 		for (int i(0), j(0); i < nw; i++)
@@ -229,7 +265,11 @@ Net* NetGenerator::GenerateFromFiles(const char* FNameN, const char* FNameB, con
 			in >> area[j].r;
 			in >> area[j++].z;
 			if (isLoging)
+				#ifdef WINDOWS 
 				printf_s("W[%d]: %d\nArea[%d]: [%d %d - %d %d]", i, W[i], (j-1) / 2, area[j-2].r, area[j-2].z, area[j-1].r, area[j-1].z);
+				#else
+				printf("W[%d]: %d\nArea[%d]: [%d %d - %d %d]", i, W[i], (j-1) / 2, area[j-2].r, area[j-2].z, area[j-1].r, area[j-1].z);
+				#endif
 		}
 
 		double* Rh = new double[nhr + 1], * Zh = new double[nhz + 1];
@@ -384,7 +424,11 @@ Net* NetGenerator::GenerateFromFiles(const char* FNameN, const char* FNameB, con
 	}
 	catch (const std::exception& exception)
 	{
+		#ifdef WINDOWS 
 		printf_s("Error: %s", exception.what());
+		#else
+		printf("Error: %s", exception.what());
+		#endif
 	}
 	if (isSavingNet)
 	{
