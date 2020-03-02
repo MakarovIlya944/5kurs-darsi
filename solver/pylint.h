@@ -13,6 +13,7 @@ PYBIND11_MODULE(cpp_solver, m) {
 	py::class_<NetGenerator>(m, "NetGenerator")
 		.def(py::init<>())
 		.def("GenerateFromFiles", &NetGenerator::GenerateFromFiles, R"pbdoc(FNameN - net.txt, FNameB - border.txt, FNameT - time.txt)pbdoc")
+		.def("test", &NetGenerator::test, R"pbdoc(FNameN - net.txt, FNameB - border.txt, FNameT - time.txt)pbdoc")
 		.def("Generate", &NetGenerator::Generate, R"pbdoc(
 Points at r
 Points at z
@@ -21,7 +22,8 @@ Step and koefficient per elemens at r
 Step and koefficient per elemens at z
 Materials border
 )pbdoc")
-.def_readwrite("isLoging", &NetGenerator::isLoging);
+//.def_readwrite("isLoging", &NetGenerator::isLoging)
+;
 
 	py::class_<Net>(m, "Net")
 		.def(py::init<>())

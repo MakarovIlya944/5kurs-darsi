@@ -13,6 +13,8 @@ else:
 class NetFabric():
     def CreateNetDefault(netFile="..\\solver\\net.txt",borderFile="..\\solver\\border.txt",timeFile="..\\solver\\time.txt"):
         a = NetGenerator()
+        a.isLogging = False;
+        a.test(netFile,borderFile,timeFile)
         return a.GenerateFromFiles(netFile,borderFile,timeFile)
 
     def CreateNet():

@@ -40,6 +40,11 @@ double RightPart(Pointd v, double t)
 	return 6 * t * t;
 }
 
+double u(Pointd v, double t)
+{
+	return t * t * t;
+}
+
 double FirstCond(Pointd v, double t)
 {
 	return u(v, t);
@@ -126,10 +131,6 @@ double ThirdCond(Pointd v)
 	}
 }
 
-double u(Pointd v, double t)
-{
-	return t * t * t;
-}
 
 MatrixGenerator::MatrixGenerator(Net *_net, double **&_Q)
 {
@@ -283,9 +284,9 @@ void MatrixGenerator::AccountNaturalCondition(int time)
 			}
 			else
 			{
-				SecCond_a = SecondCond(globnet[*a]);
-				SecCond_b = SecondCond(globnet[*b]);
-				SecCond_c = SecondCond(globnet[*c]);
+				SecCond_a = SecondCond(globnet[*a], time);
+				SecCond_b = SecondCond(globnet[*b], time);
+				SecCond_c = SecondCond(globnet[*c], time);
 				if ((*c) - (*a) == 2) //r
 				{
 					MakeLocalMatrixMassR(globnet[*a].r, CoefficientSigma(globnet[*a]), CoefficientSigma(globnet[*c]), h);
@@ -321,8 +322,8 @@ void MatrixGenerator::AccountNaturalCondition(int time)
 
 	double koef = 0;
 	int indexis[3];
-	if (!nvr3.empty())
-		for (auto c = nvr3.begin(), a = c++, b = c++;;)
+	if (!(net->nvr3.empty()))
+		for (auto c = net->nvr3.begin(), a = c++, b = c++;;)
 		{
 			indexis[0] = *a;
 			indexis[1] = *b;
@@ -347,9 +348,9 @@ void MatrixGenerator::AccountNaturalCondition(int time)
 			}
 			else
 			{
-				SecCond_a = SecondCond(globnet[*a]);
-				SecCond_b = SecondCond(globnet[*b]);
-				SecCond_c = SecondCond(globnet[*c]);
+				SecCond_a = SecondCond(globnet[*a], time);
+				SecCond_b = SecondCond(globnet[*b], time);
+				SecCond_c = SecondCond(globnet[*c], time);
 				if ((*c) - (*a) == 2) //r
 				{
 					MakeLocalMatrixMassR(globnet[*a].r, CoefficientSigma(globnet[*a]), CoefficientSigma(globnet[*c]), h);
@@ -422,7 +423,7 @@ void MatrixGenerator::AccountNaturalCondition(int time)
 					c++;
 				}
 				c++;
-				if (c == nvr3.end())
+				if (c == net->nvr3.end())
 					break;
 				c++;
 			}
@@ -435,7 +436,7 @@ void MatrixGenerator::AccountMainCondition(int time)
 	int ibeg, iend;
 	bool flag = true;
 	double cond;
-	for (int var : nvr1)
+	for (int var : net->nvr1)
 	{
 		if (var == -1)
 			curType = 0;
@@ -443,7 +444,7 @@ void MatrixGenerator::AccountMainCondition(int time)
 			curType = var;
 		else
 		{
-			cond = FirstCond(globnet[var]);
+			cond = FirstCond(net->GlobalNet[var], time);
 			di[var] = 1;
 			f[var] = cond;
 			ibeg = var ? ig[var - 1] : 0;

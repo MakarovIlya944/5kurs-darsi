@@ -93,6 +93,8 @@ public:
 
 	Net* Generate(vector<double> R, vector<double> Z, double step, vector<double> r_steps, vector<double> z_steps, vector<int> materialIds, vector<Pointi> materials, vector<int> B, vector<int> V, vector<Pointi> border, vector<double> T, double t_step, vector<double> t_steps);
 
+	void test(const char* FNameN, const char* FNameB, const char* FNameT);
+
 	//FNameN - net.txt , FNameB - border.txt , FNameT - time.txt
 	Net* GenerateFromFiles(const char* FNameN, const char* FNameB, const char* FNameT);
 
